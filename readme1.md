@@ -9,15 +9,28 @@ A Django REST API service for banking-style customer management, loan eligibilit
 
 *Below you can add screenshots/screens captures as proof of API working, data injections, or Swagger UI.*
 
-| Output and Document Video   | Preview / Link |
-|----------------------------|----------------|
-| API Testing and Output     | [![output](https://img.youtube.com/vi/HLHRf7H_2BU/0.jpg)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS) |
-| Swagger UI Overview        | [![Swagger](https://img.youtube.com/vi/2UDiVJcBf_8/0.jpg)](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR) |
-| Code Review                | [![Code](https://img.youtube.com/vi/Bnu2kqgZpoU/0.jpg)](https://youtu.be/Bnu2kqgZpoU?si=gXBMFnivMVrS_eTU) |
+| Screenshot Description         | Preview / Link                      |
+|-------------------------------|-----------------------------------|
+| Postman Register Customer API | ![register](./images/register.png) |
+| Swagger UI Overview            | ![swagger](./images/swagger.png)   |
+| Data Injection Success         | ![data-injection](./images/data_injection.png) |
 
-
+_Replace the above image paths with actual screenshots you capture during testing._
 
 ---
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Setup: Local Development](#setup-local-development)
+- [Setup: Docker (Production/Cloud)](#setup-docker-productioncloud)
+- [Database & Initial Data Injection](#database--initial-data-injection)
+- [API Endpoints & Examples](#api-endpoints--examples)
+- [Swagger/OpenAPI Documentation](#swaggeropenapi-documentation)
+- [Proof Screenshots](#proof-screenshots)
+- [Troubleshooting](#troubleshooting)
 
 ## Features
 - Injection of data from excel to database
@@ -127,7 +140,8 @@ Base URL: `http://localhost:8000/api/`
 
 ### EXAMPLE VIDEO PROF-
 
-[![output](https://img.youtube.com/vi/HLHRf7H_2BU/0.jpg)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)
+[![Watch the video](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)
+
 
 ### 1. Register Customer
 **POST** `/register`
@@ -190,11 +204,11 @@ Response shows approval and monthly EMI.
 
 ```json
 {
-  "loan_id": null,
-  "customer_id": "1",
-  "loan_approved": false,
-  "message": "Total EMIs exceed 50% of monthly salary.",
-  "monthly_installment": 0
+	"loan_id": null,
+	"customer_id": "1",
+	"loan_approved": false,
+	"message": "Total EMIs exceed 50% of monthly salary.",
+	"monthly_installment": 0
 }
 ```
 
@@ -203,18 +217,18 @@ Response shows approval and monthly EMI.
 
 ```json
 {
-  "loan_id": "7507",
-  "customer": {
-    "id": "132",
-    "first_name": "Allan",
-    "last_name": "Palacios",
-    "phone_number": "9712913338",
-    "age": 54
-  },
-  "loan_amount": 800000.0,
-  "interest_rate": 13.01,
-  "monthly_installment": 23406.0,
-  "tenure": 63
+	"loan_id": "7507",
+	"customer": {
+		"id": "132",
+		"first_name": "Allan",
+		"last_name": "Palacios",
+		"phone_number": "9712913338",
+		"age": 54
+	},
+	"loan_amount": 800000.0,
+	"interest_rate": 13.01,
+	"monthly_installment": 23406.0,
+	"tenure": 63
 }
 
 ```
@@ -224,84 +238,73 @@ Response shows approval and monthly EMI.
 
 ```json
 [
-  {
-    "loan_id": "1198",
-    "loan_amount": 900000.0,
-    "interest_rate": 14.82,
-    "monthly_installment": 32147.0,
-    "repayments_left": 49
-  },
-  {
-    "loan_id": "3535",
-    "loan_amount": 800000.0,
-    "interest_rate": 16.94,
-    "monthly_installment": 30292.0,
-    "repayments_left": 39
-  },
-  {
-    "loan_id": "4725",
-    "loan_amount": 400000.0,
-    "interest_rate": 10.64,
-    "monthly_installment": 12039.0,
-    "repayments_left": 6
-  },
-  {
-    "loan_id": "4189",
-    "loan_amount": 100000.0,
-    "interest_rate": 13.04,
-    "monthly_installment": 2614.0,
-    "repayments_left": 17
-  }
+	{
+		"loan_id": "1198",
+		"loan_amount": 900000.0,
+		"interest_rate": 14.82,
+		"monthly_installment": 32147.0,
+		"repayments_left": 49
+	},
+	{
+		"loan_id": "3535",
+		"loan_amount": 800000.0,
+		"interest_rate": 16.94,
+		"monthly_installment": 30292.0,
+		"repayments_left": 39
+	},
+	{
+		"loan_id": "4725",
+		"loan_amount": 400000.0,
+		"interest_rate": 10.64,
+		"monthly_installment": 12039.0,
+		"repayments_left": 6
+	},
+	{
+		"loan_id": "4189",
+		"loan_amount": 100000.0,
+		"interest_rate": 13.04,
+		"monthly_installment": 2614.0,
+		"repayments_left": 17
+	}
 ]
 
 ```
 
+
+
 ## Swagger/OpenAPI Documentation
 
-
-### EXAMPLE VIDEO PROF-
- [![Swagger](https://img.youtube.com/vi/2UDiVJcBf_8/0.jpg)](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR)
-
- 
 Interactive API docs and testing UI available at:
 
 ```
 http://localhost:8000/swagger/
 ```
 
+If not active, ensure `drf-yasg` is installed and your project's `urls.py` includes the schema view, as previously described.
 
-## 🐳 Setup: Docker (Production/Cloud)
+## Proof Screenshots
 
-1. **Build Docker image**
+| Description                | Image or Example                          |
+|----------------------------|-------------------------------------------|
+| Docker Compose running     | ![docker-running](images    |
+| Data Injection Success     | ![data-inject](images/in       |
+| Swagger API UI             | ![swagger-ui](images/swagger       |
+| Test API in Postman        | ![postman-success](images     |
 
-   ```bash
-   docker-compose build
-   ```
+*Add your screenshots to an `images/` directory; update paths as needed.*
 
-2. **Launch all services**
+## Troubleshooting
 
-   ```bash
-   docker-compose up
-   ```
+- **Migration/Data Errors:**  
+  If you ever see `invalid input syntax for type integer: ""`, delete problematic rows from your DB, or drop/recreate the dev database.
+- **Docker can't find Gunicorn:**  
+  `pip install gunicorn` in your `requirements.txt`.
+- **DB connection issues:**  
+  Verify all DB credentials in `.env` are correct for NeonDB.
+- **Container not running:**  
+  Check logs via `docker-compose logs web`.
 
-   * App will run at: [http://localhost:8000/](http://localhost:8000/)
+**Enjoy your full-stack, production-ready Django backend!**
+If you have further deployment/security/API documentation needs, reach out or consult OpenAPI at `/swagger/`.
 
-3. **Inject initial Excel data (in new terminal)**
-
-   ```bash
-   docker-compose run web python manage.py inject_data
-   ```
-
-> 💡 You don't need to Dockerize the database. Django connects directly to **NeonDB** using `.env`.
-
----
-
-### ✅ Docker Setup Proof
-
-| Description            | Screenshot                                       |
-| ---------------------- | ------------------------------------------------ |
-| Docker Compose Running | ![docker-running](./endpoint%20documet%20images/docker.png)   |
-| Docker setup done         | ![swagger-ui](./endpoint%20documet%20images/docker%20run.png)           |
-| Docker Desktop    | ![postman-success](./endpoint%20documet%20images/d.png) |
-
-
+[imageageace your real screenshots as `images/docker-up.png`, `images/inject-ok.png`, etc., in your repository to display them in this section.)*
