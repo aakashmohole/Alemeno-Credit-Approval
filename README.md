@@ -20,7 +20,7 @@ A Django REST API service for banking-style customer management, loan eligibilit
 ---
 
 ## Features
-- Injection of data from excel to database
+- Injection of data from excel to database available code in `credit_approval\core\management\commands\inject_data.py`
 - Customer registration with auto-calculated approved limit.
 - Loan eligibility checking based on historical repayment data.
 - Compound interest EMI calculation.
