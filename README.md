@@ -26,6 +26,7 @@ A Django REST API service for banking-style customer management, loan eligibilit
 - Compound interest EMI calculation.
 - Controlled loan approval and rejection with clear reasons.
 - View loan(s) by customer or loan ID.
+- Unit Testing created at `test.py` file
 - Interactive API documentation (Swagger UI).
 - NeonDB/Postgres integration.
 - **Easy deployment via Docker Compose.**
