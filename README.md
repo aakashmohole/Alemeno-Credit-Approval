@@ -9,11 +9,12 @@ A Django REST API service for banking-style customer management, loan eligibilit
 
 *Below you can add screenshots/screens captures as proof of API working, data injections, or Swagger UI.*
 
-| Output and Document Video         | Preview / Link                      |
-|-------------------------------|-----------------------------------|
-| API Testing and output video | [![output]](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS) |
-| Swagger UI Overview            | [![Swagger]()](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR)   |
-| Data Injection Success         | ![data-injection](./images/data_injection.png) |
+| Output and Document Video   | Preview / Link |
+|----------------------------|----------------|
+| API Testing and Output     | [![output](https://img.youtube.com/vi/HLHRf7H_2BU/0.jpg)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS) |
+| Swagger UI Overview        | [![Swagger](https://img.youtube.com/vi/2UDiVJcBf_8/0.jpg)](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR) |
+| Code Review (Image Only)   | ![data-injection](./images/data_injection.png) |
+
 
 _Replace the above image paths with actual screenshots you capture during testing._
 
