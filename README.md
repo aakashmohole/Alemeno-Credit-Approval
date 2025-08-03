@@ -9,10 +9,10 @@ A Django REST API service for banking-style customer management, loan eligibilit
 
 *Below you can add screenshots/screens captures as proof of API working, data injections, or Swagger UI.*
 
-| Screenshot Description         | Preview / Link                      |
+| Output and Document Video         | Preview / Link                      |
 |-------------------------------|-----------------------------------|
-| Postman Register Customer API | ![register](./images/register.png) |
-| Swagger UI Overview            | ![swagger](./images/swagger.png)   |
+| API Testing and output video | [![output]](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS) |
+| Swagger UI Overview            | [![Swagger]()](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR)   |
 | Data Injection Success         | ![data-injection](./images/data_injection.png) |
 
 _Replace the above image paths with actual screenshots you capture during testing._
@@ -140,7 +140,7 @@ Base URL: `http://localhost:8000/api/`
 
 ### EXAMPLE VIDEO PROF-
 
-[![Watch the video](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)
+[![Watch the video]()](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)
 
 
 ### 1. Register Customer
