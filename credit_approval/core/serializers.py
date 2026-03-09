@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from .models import Customer, Loan
+from decimal import Decimal
 
 class CustomerRegisterSerializer(serializers.ModelSerializer):
-    monthly_income = serializers.DecimalField(max_digits=12, decimal_places=2, source='monthly_salary')
+    monthly_income = serializers.IntegerField(source='monthly_salary')
     
     class Meta:
         model = Customer
@@ -10,13 +11,15 @@ class CustomerRegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         monthly_salary = validated_data['monthly_salary']
-        approved_limit = round(36 * monthly_salary, -5)  # nearest lakh rounding
-        validated_data['approved_limit'] = approved_limit
+        # approved_limit = 36 * monthly_salary (rounded to nearest lakh)
+        approved_limit = round(36 * float(monthly_salary), -5)
+        validated_data['approved_limit'] = Decimal(str(approved_limit))
         return Customer.objects.create(**validated_data)
 
 class CustomerResponseSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    monthly_income = serializers.DecimalField(max_digits=12, decimal_places=2, source='monthly_salary')
+    monthly_income = serializers.IntegerField(source='monthly_salary')
+    approved_limit = serializers.IntegerField()
     
     class Meta:
         model = Customer
@@ -27,9 +30,9 @@ class CustomerResponseSerializer(serializers.ModelSerializer):
 
 class CheckEligibilitySerializer(serializers.Serializer):
     customer_id = serializers.IntegerField()
-    loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    loan_amount = serializers.FloatField()
     interest_rate = serializers.FloatField()
-    tenure = serializers.IntegerField(min_value=1)
+    tenure = serializers.IntegerField()
 
 class CheckEligibilityResponseSerializer(serializers.Serializer):
     customer_id = serializers.IntegerField()
@@ -37,35 +40,28 @@ class CheckEligibilityResponseSerializer(serializers.Serializer):
     interest_rate = serializers.FloatField()
     corrected_interest_rate = serializers.FloatField()
     tenure = serializers.IntegerField()
-    monthly_installment = serializers.DecimalField(max_digits=15, decimal_places=2)
+    monthly_installment = serializers.FloatField()
 
 class CreateLoanSerializer(serializers.Serializer):
     customer_id = serializers.IntegerField()
-    loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    loan_amount = serializers.FloatField()
     interest_rate = serializers.FloatField()
-    tenure = serializers.IntegerField(min_value=1)
+    tenure = serializers.IntegerField()
 
 class CreateLoanResponseSerializer(serializers.Serializer):
     loan_id = serializers.IntegerField(allow_null=True)
     customer_id = serializers.IntegerField()
     loan_approved = serializers.BooleanField()
     message = serializers.CharField()
-    monthly_installment = serializers.DecimalField(max_digits=15, decimal_places=2)
+    monthly_installment = serializers.FloatField()
 
 class LoanDetailSerializer(serializers.ModelSerializer):
-    monthly_installment = serializers.DecimalField(max_digits=15, decimal_places=2)
+    customer = serializers.SerializerMethodField()
+    monthly_installment = serializers.FloatField(source='monthly_payment')
     
     class Meta:
         model = Loan
-        fields = ['loan_id', 'loan_amount', 'interest_rate', 'monthly_installment', 'tenure']
-
-class LoanWithCustomerSerializer(serializers.Serializer):
-    loan_id = serializers.IntegerField()
-    loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
-    interest_rate = serializers.FloatField()
-    monthly_installment = serializers.DecimalField(max_digits=15, decimal_places=2)
-    tenure = serializers.IntegerField()
-    customer = serializers.SerializerMethodField()
+        fields = ['loan_id', 'customer', 'loan_amount', 'interest_rate', 'monthly_installment', 'tenure']
 
     def get_customer(self, obj):
         c = obj.customer
@@ -76,3 +72,14 @@ class LoanWithCustomerSerializer(serializers.Serializer):
             "phone_number": c.phone_number,
             "age": c.age,
         }
+
+class ViewLoansByCustomerSerializer(serializers.ModelSerializer):
+    monthly_installment = serializers.FloatField(source='monthly_payment')
+    repayments_left = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Loan
+        fields = ['loan_id', 'loan_amount', 'interest_rate', 'monthly_installment', 'repayments_left']
+
+    def get_repayments_left(self, obj):
+        return max(0, obj.tenure - obj.emis_paid_on_time)

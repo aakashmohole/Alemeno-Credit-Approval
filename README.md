@@ -1,43 +1,29 @@
-
 # Credit Approval System Backend
 
-A Django REST API service for banking-style customer management, loan eligibility, and approval workflows, with PostgreSQL (NeonDB) and Docker support.
-
-
-
-## Images
-
-*Below you can add screenshots/screens captures as proof of API working, data injections, or Swagger UI.*
-
-| Output and Document Video   | Preview / Link |
-|----------------------------|----------------|
-| API Testing and Output     | [![output](https://img.youtube.com/vi/HLHRf7H_2BU/0.jpg)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS) |
-| Swagger UI Overview        | [![Swagger](https://img.youtube.com/vi/2UDiVJcBf_8/0.jpg)](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR) |
-| Code Review                | [![Code](https://img.youtube.com/vi/Bnu2kqgZpoU/0.jpg)](https://youtu.be/Bnu2kqgZpoU?si=gXBMFnivMVrS_eTU) |
-
-
+A Django REST API service for banking-style customer management, loan eligibility, and approval workflows, with PostgreSQL, Redis, and Celery support.
 
 ---
 
 ## Features
-- Injection of data from excel to database available code in `credit_approval\core\management\commands\inject_data.py`
+- Ingestion of data from excel to database via Celery background tasks.
 - Customer registration with auto-calculated approved limit.
 - Loan eligibility checking based on historical repayment data.
 - Compound interest EMI calculation.
 - Controlled loan approval and rejection with clear reasons.
 - View loan(s) by customer or loan ID.
-- Unit Testing created at `test.py` file
+- Unit Testing for core logic.
 - Interactive API documentation (Swagger UI).
-- NeonDB/Postgres integration.
+- PostgreSQL integration.
 - **Easy deployment via Docker Compose.**
 
 ## Tech Stack
 
 - Django 4+, Django REST Framework
-- PostgreSQL (NeonDB cloud DB)
+- PostgreSQL
+- Redis & Celery (Asynchronous tasks)
 - Docker & Docker Compose
 - Python 3.10+
-- Openpyxl (for Excel injection)
+- Pandas & Openpyxl (for Excel ingestion)
 - drf-yasg (Swagger Documentation)
 
 ## Project Structure
@@ -45,9 +31,9 @@ A Django REST API service for banking-style customer management, loan eligibilit
 ```
 credit_approval/
 │
-├── core/                  # Django app (business logic, models, views)
+├── core/                  # Django app (business logic, models, views, tasks)
 │
-├── credit_approval/       # Project folder (settings, wsgi, urls)
+├── credit_approval/       # Project folder (settings, wsgi, urls, celery)
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -58,77 +44,34 @@ credit_approval/
 └── ... (other files)
 ```
 
-## Setup: Local Development
+## Setup & Deployment
 
 1. **Clone the repository**
-2. **Create a virtual environment & activate**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
+2. **Configure `.env`** (Use the provided structure):
    ```
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   # (If no requirements.txt: pip install django djangorestframework psycopg2-binary python-dotenv openpyxl drf-yasg gunicorn)
-   ```
-4. **Configure `.env`** with your NeonDB credentials (do not commit real data):
-   ```
-   NEON_DATABASE_URL= your_db_url
+   DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
    SECRET_KEY=your_secret
    DJANGO_DEBUG=True
    DJANGO_ALLOWED_HOSTS=*
+   CELERY_BROKER_URL=redis://redis:6379/0
+   CELERY_RESULT_BACKEND=redis://redis:6379/0
    ```
-5. **Apply migrations**
+3. **Launch all services via Docker Compose**
    ```bash
-   python manage.py makemigrations
-   python manage.py migrate
+   docker-compose up -d --build
    ```
-6. **Inject initial Excel data**
-   - Place `customer_data.xlsx` and `loan_data.xlsx` in the project root.
+   - Web Server: [http://localhost:8000/](http://localhost:8000/)
+   - Swagger Documentation: [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+
+4. **Inject initial Excel data**
+   - The ingestion is handled by a management command that triggers a Celery task.
    ```bash
-   python manage.py inject_data
-   ```
-7. **Run server**
-   ```bash
-   python manage.py runserver
+   docker-compose exec web python manage.py inject_data
    ```
 
-## Setup: Docker (Production/Cloud)
-
-1. **Build Docker image**
-   ```bash
-   docker-compose build
-   ```
-2. **Launch all services**
-   ```bash
-   docker-compose up
-   ```
-   - Server will be live at: [http://localhost:8000/](http://localhost:8000/)
-3. **Inject initial data (run in separate terminal if needed)**
-   ```bash
-   docker-compose run web python manage.py inject_data
-   ```
-
-No need to Dockerize the database: **Django connects directly to NeonDB via `.env`**.
-
-## Database & Initial Data Injection
-
-**Data files required:**
-- `customer_data.xlsx` (Customer ID, First Name, Last Name, Age, Phone Number, Monthly Salary, Approved Limit)
-- `loan_data.xlsx` (Customer ID, Loan ID, Loan Amount, Tenure, Interest Rate, Monthly payment, EMIs paid on Time, Date of Approval, End Date)
-
-**On inject success:**
-```
-Data injection completed successfully.
-```
-
-## API Endpoints & Examples
+## API Endpoints
 
 Base URL: `http://localhost:8000/api/`
-
-### EXAMPLE VIDEO PROF-
-
-[![output](https://img.youtube.com/vi/HLHRf7H_2BU/0.jpg)](https://youtu.be/HLHRf7H_2BU?si=Y3aeEr7eke4UJgPS)
 
 ### 1. Register Customer
 **POST** `/register`
@@ -138,18 +81,6 @@ Base URL: `http://localhost:8000/api/`
   "last_name": "Doe",
   "age": 30,
   "monthly_income": 80000,
-  "phone_number": "1234567890"
-}
-```
-
-Response:
-```json
-{
-  "customer_id": 1,
-  "name": "John Doe",
-  "age": 30,
-  "monthly_income": 80000.00,
-  "approved_limit": 2880000.00,
   "phone_number": "1234567890"
 }
 ```
@@ -164,18 +95,6 @@ Response:
   "tenure": 24
 }
 ```
-Response (`approval`, `corrected_interest_rate`, etc. as per rules).
-```json
-{
-  "customer_id": 1,
-  "approval" : true,
-  "interest_rate": 5%,
-  "corrected_interest_rate": 8.0%,
-  "tenure": 24,
-  "monthly_installment" : ....
-}
-
-```
 
 ### 3. Create Loan
 **POST** `/create-loan`
@@ -187,122 +106,15 @@ Response (`approval`, `corrected_interest_rate`, etc. as per rules).
   "tenure": 12
 }
 ```
-Response shows approval and monthly EMI.
-
-```json
-{
-  "loan_id": null,
-  "customer_id": "1",
-  "loan_approved": false,
-  "message": "Total EMIs exceed 50% of monthly salary.",
-  "monthly_installment": 0
-}
-```
 
 ### 4. View Loan Details
 **GET** `/view-loan/{loan_id}`
 
-```json
-{
-  "loan_id": "7507",
-  "customer": {
-    "id": "132",
-    "first_name": "Allan",
-    "last_name": "Palacios",
-    "phone_number": "9712913338",
-    "age": 54
-  },
-  "loan_amount": 800000.0,
-  "interest_rate": 13.01,
-  "monthly_installment": 23406.0,
-  "tenure": 63
-}
-
-```
-
 ### 5. View Loans by Customer
 **GET** `/view-loans/{customer_id}`
 
-```json
-[
-  {
-    "loan_id": "1198",
-    "loan_amount": 900000.0,
-    "interest_rate": 14.82,
-    "monthly_installment": 32147.0,
-    "repayments_left": 49
-  },
-  {
-    "loan_id": "3535",
-    "loan_amount": 800000.0,
-    "interest_rate": 16.94,
-    "monthly_installment": 30292.0,
-    "repayments_left": 39
-  },
-  {
-    "loan_id": "4725",
-    "loan_amount": 400000.0,
-    "interest_rate": 10.64,
-    "monthly_installment": 12039.0,
-    "repayments_left": 6
-  },
-  {
-    "loan_id": "4189",
-    "loan_amount": 100000.0,
-    "interest_rate": 13.04,
-    "monthly_installment": 2614.0,
-    "repayments_left": 17
-  }
-]
-
-```
-
-## Swagger/OpenAPI Documentation
-
-
-### EXAMPLE VIDEO PROF-
- [![Swagger](https://img.youtube.com/vi/2UDiVJcBf_8/0.jpg)](https://youtu.be/2UDiVJcBf_8?si=QyQqzMQfNl-NN-TR)
-
- 
-Interactive API docs and testing UI available at:
-
-```
-http://localhost:8000/swagger/
-```
-
-
-## 🐳 Setup: Docker (Production/Cloud)
-
-1. **Build Docker image**
-
-   ```bash
-   docker-compose build
-   ```
-
-2. **Launch all services**
-
-   ```bash
-   docker-compose up
-   ```
-
-   * App will run at: [http://localhost:8000/](http://localhost:8000/)
-
-3. **Inject initial Excel data (in new terminal)**
-
-   ```bash
-   docker-compose run web python manage.py inject_data
-   ```
-
-> 💡 You don't need to Dockerize the database. Django connects directly to **NeonDB** using `.env`.
-
 ---
 
-### ✅ Docker Setup Proof
-
-| Description            | Screenshot                                       |
-| ---------------------- | ------------------------------------------------ |
-| Docker Compose Running | ![docker-running](./endpoint%20documet%20images/docker.png)   |
-| Docker setup done         | ![swagger-ui](./endpoint%20documet%20images/docker%20run.png)           |
-| Docker Desktop    | ![postman-success](./endpoint%20documet%20images/d.png) |
-
-
+### Swagger/OpenAPI Documentation
+Interactive API docs and testing UI available at:
+`http://localhost:8000/swagger/`
