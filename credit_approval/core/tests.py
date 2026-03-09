@@ -102,7 +102,7 @@ class CreateLoanTests(APITestCase):
             monthly_payment=Decimal('150000'),
             emis_paid_on_time=12,
             date_of_approval='2024-01-01',
-            end_date='2026-01-01'
+            end_date='2027-01-01'
         )
 
         url = reverse('create_loan')
